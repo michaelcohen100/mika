@@ -1,0 +1,8 @@
+{
+  "name": "Gemini Brand Studio",
+  "description": "A personalized AI studio that learns your appearance and product to generate marketing visuals.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
