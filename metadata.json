@@ -1,6 +1,6 @@
 {
-  "name": "Gemini Brand Studio",
-  "description": "A personalized AI studio that learns your appearance and product to generate marketing visuals.",
+  "name": "Studio Photo Pulsee",
+  "description": "Un studio IA personnalisé qui apprend votre apparence et celle de vos produits pour générer des visuels marketing.",
   "requestFramePermissions": [
     "camera",
     "microphone"

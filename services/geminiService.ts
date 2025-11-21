@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type, Modality } from "@google/genai";
-import { EntityProfile, GenerationMode } from "../types";
+import { EntityProfile, GenerationMode, ExportFormat } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -49,7 +49,7 @@ export const analyzeImageForTraining = async (
       }
     });
 
-    return response.text || "No description generated.";
+    return response.text || "Pas de description générée.";
   } catch (error) {
     console.error("Error analyzing images:", error);
     throw error;
@@ -116,7 +116,7 @@ export const generateBrandVisual = async (
     // 2. Prompt Engineering
     promptBuilder += `\n\nROLE: Professional Commercial Photographer & Digital Artist.`;
     promptBuilder += `\nTASK: Create a photorealistic image based on the user's request.`;
-    promptBuilder += `\nUSER REQUEST: "${userPrompt}"`;
+    promptBuilder += `\nUSER REQUEST (Translate to English internally): "${userPrompt}"`;
     
     if (imageParts.length > 0) {
       promptBuilder += `\n\nVISUAL INSTRUCTIONS:`;
@@ -151,7 +151,7 @@ export const generateBrandVisual = async (
     
     // Safety Check
     if (candidate?.finishReason && candidate.finishReason !== 'STOP') {
-       throw new Error(`The AI blocked this request due to: ${candidate.finishReason}. Try removing specific face descriptors or complex actions.`);
+       throw new Error(`L'IA a bloqué cette demande en raison de : ${candidate.finishReason}. Essayez de supprimer les descripteurs spécifiques de visage ou les actions complexes.`);
     }
 
     if (candidate?.content?.parts) {
@@ -165,13 +165,97 @@ export const generateBrandVisual = async (
     
     const textPart = candidate?.content?.parts?.find(p => p.text);
     if (textPart) {
-        throw new Error(`Model returned text instead of image: ${textPart.text}`);
+        throw new Error(`Le modèle a renvoyé du texte au lieu d'une image : ${textPart.text}`);
     }
     
-    throw new Error("Generation completed but no image data was returned.");
+    throw new Error("La génération est terminée mais aucune donnée d'image n'a été renvoyée.");
   };
 
   return retryOperation(performGeneration, 3);
+};
+
+/**
+ * MAGIC EDITOR: Modifies an existing image based on instruction.
+ */
+export const editGeneratedVisual = async (
+  originalImageUrl: string,
+  instruction: string
+): Promise<string> => {
+  
+  const performEdit = async () => {
+    const base64Data = originalImageUrl.includes(',') ? originalImageUrl.split(',')[1] : originalImageUrl;
+    
+    const parts = [
+      {
+        inlineData: {
+          mimeType: 'image/png',
+          data: base64Data
+        }
+      },
+      { text: `ROLE: Expert Photo Retoucher.\nTASK: Edit this image. ${instruction}\nCONSTRAINT: Maintain the identity of the person and the look of the product exactly. Only modify what is requested.` }
+    ];
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { parts },
+      config: {
+        imageConfig: { aspectRatio: "1:1" }
+      }
+    });
+
+    const candidate = response.candidates?.[0];
+    if (candidate?.content?.parts) {
+      for (const part of candidate.content.parts) {
+        if (part.inlineData) {
+           return `data:image/png;base64,${part.inlineData.data}`;
+        }
+      }
+    }
+    throw new Error("L'édition a échoué.");
+  };
+  return retryOperation(performEdit, 2);
+};
+
+/**
+ * EXPORT STUDIO: Expands image to new format (Outpainting).
+ */
+export const expandImageForFormat = async (
+  originalImageUrl: string,
+  format: ExportFormat
+): Promise<string> => {
+  
+  const performExpansion = async () => {
+    const base64Data = originalImageUrl.includes(',') ? originalImageUrl.split(',')[1] : originalImageUrl;
+    
+    const parts = [
+      {
+        inlineData: {
+          mimeType: 'image/png',
+          data: base64Data
+        }
+      },
+      { text: `ROLE: Digital Artist.\nTASK: Expand the canvas of this image to fit a ${format} aspect ratio for social media use.\nINSTRUCTION: Seamlessly extend the background. Do NOT distort or crop the central subject/product. Keep the style consistent.` }
+    ];
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: { parts },
+      config: {
+        imageConfig: { aspectRatio: format }
+      }
+    });
+
+    const candidate = response.candidates?.[0];
+    if (candidate?.content?.parts) {
+      for (const part of candidate.content.parts) {
+        if (part.inlineData) {
+           return `data:image/png;base64,${part.inlineData.data}`;
+        }
+      }
+    }
+    throw new Error("L'exportation a échoué.");
+  };
+  return retryOperation(performExpansion, 2);
 };
 
 /**
@@ -183,12 +267,12 @@ export const refinePrompt = async (roughIdea: string, context?: string): Promise
       model: 'gemini-2.5-flash',
       contents: `
         You are a World-Class Prompt Engineer for AI Image Generators.
-        Your task: Take the user's rough idea and convert it into a "Master Prompt" optimized for photorealism.
+        Your task: Take the user's rough idea (which might be in French) and convert it into an ENGLISH "Master Prompt" optimized for photorealism.
         
         User's Rough Idea: "${roughIdea}"
         Context: ${context || 'General scene'}
         
-        Format the output as a single, dense, highly detailed paragraph.
+        Format the output as a single, dense, highly detailed paragraph in ENGLISH.
         Include specific keywords for:
         - Subject details (pose, expression)
         - Lighting (e.g., volumetric, cinematic, golden hour, studio softbox)
@@ -196,7 +280,7 @@ export const refinePrompt = async (roughIdea: string, context?: string): Promise
         - Art Style (e.g., Hyper-realistic, 8k, Unreal Engine 5 render, Vogue editorial)
         - Color Grading
         
-        Output ONLY the prompt text. No intro or explanation.
+        Output ONLY the English prompt text. No intro or explanation.
       `,
     });
     return response.text || roughIdea;
@@ -212,7 +296,7 @@ export const suggestPrompts = async (
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: `Suggest 3 creative, distinct photo concepts for: Person (${userDesc.substring(0, 50)}...) and Product (${productDesc.substring(0, 50)}...). Return valid JSON array of strings.`,
+      contents: `Suggest 3 creative, distinct photo concepts for: Person (${userDesc.substring(0, 50)}...) and Product (${productDesc.substring(0, 50)}...). Return valid JSON array of strings in French.`,
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
@@ -226,6 +310,6 @@ export const suggestPrompts = async (
     if (!text) return [];
     return JSON.parse(text);
   } catch (e) {
-    return ["Studio product shoot with moody lighting", "Outdoor lifestyle shot in nature", "Modern urban street style composition"];
+    return ["Séance photo studio avec éclairage sombre", "Photo lifestyle en extérieur dans la nature", "Composition style urbain moderne"];
   }
 };

@@ -1,3 +1,4 @@
+
 export enum AppStep {
   ONBOARDING = 'ONBOARDING',
   DASHBOARD = 'DASHBOARD',
@@ -32,8 +33,10 @@ export interface GeneratedImage {
   prompt: string;
   mode: GenerationMode;
   productId?: string; // Which product was used
+  styleId?: string; // The style used
   timestamp: number;
   feedback?: 'like' | 'dislike';
+  parentId?: string; // If derived from another image (edit/export)
 }
 
 export interface TrainingData {
@@ -44,3 +47,14 @@ export interface TrainingData {
   userName: string;
   productName: string;
 }
+
+export interface ArtStyle {
+  id: string;
+  label: string;
+  promptModifier: string;
+  icon: string; // Emoji or icon name
+  color: string;
+}
+
+export type EditorTab = 'details' | 'edit' | 'export';
+export type ExportFormat = '9:16' | '16:9';

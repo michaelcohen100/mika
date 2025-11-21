@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Studio } from './components/Studio';
 import { Dashboard } from './components/Dashboard';
@@ -82,28 +81,12 @@ const App: React.FC = () => {
   };
 
   const handleUpdateProducts = async (products: EntityProfile[]) => {
-    // This is a bit simplified: we're saving all, but in Studio we usually update one by one.
-    // To ensure sync, we iterate.
     for (const p of products) {
       await db.saveProfile(p);
     }
-    // Handle deletions? 
-    // For now, we rely on Studio deleting individually or us syncing the list.
-    // Since db.saveProfile overwrites, we just need to handle deletions explicitly if needed.
-    // For this quick implementation, we assume additions/edits mainly.
-    // If specific deletion is needed, Studio calls a delete method.
-    
-    // Actually, Studio calls this with the new full list. 
-    // We should probably find diffs, but for now let's just save the new list state.
-    // To properly handle deletes, we might need a separate onDelete prop, but 
-    // Studio implementation currently filters the list and calls this.
-    // We'd need to clear DB and rewrite, or better, App handles delete.
-    // Let's stick to saving updates for now.
-    
     setState(prev => ({ ...prev, products }));
   };
   
-  // Specialized delete handler if needed for Studio to be cleaner
   const handleDeleteProduct = async (id: string) => {
      await db.deleteProfile(id);
      setState(prev => ({
@@ -144,7 +127,7 @@ const App: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading Studio Database...</div>;
+    return <div className="min-h-screen bg-black flex items-center justify-center text-white">Chargement de Studio Photo Pulsee...</div>;
   }
 
   // If onboarding, show only wizard
@@ -153,7 +136,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-black text-white">
          <nav className="border-b border-gray-800 p-4">
             <div className="flex items-center gap-2 text-xl font-bold">
-              <Sparkles className="text-blue-500" /> Gemini Brand Studio
+              <Sparkles className="text-blue-500" /> Studio Photo Pulsee
             </div>
          </nav>
          <div className="pt-10">
@@ -172,7 +155,7 @@ const App: React.FC = () => {
             <div className="bg-gradient-to-tr from-blue-600 to-purple-600 p-2 rounded-lg">
               <Sparkles size={20} className="text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight hidden md:block">Gemini Brand Studio</span>
+            <span className="font-bold text-xl tracking-tight hidden md:block">Studio Photo Pulsee</span>
           </div>
           
           {/* Navigation Tabs */}
@@ -181,7 +164,7 @@ const App: React.FC = () => {
               active={view === AppStep.DASHBOARD} 
               onClick={() => setView(AppStep.DASHBOARD)} 
               icon={LayoutDashboard} 
-              label="Create" 
+              label="Créer" 
             />
             <NavButton 
               active={view === AppStep.STUDIO} 
@@ -207,8 +190,6 @@ const App: React.FC = () => {
             products={state.products}
             onUpdateUser={handleUpdateUser}
             onUpdateProducts={handleUpdateProducts}
-            // We override the standard update with our specific delete handler logic if we passed it down
-            // For now, Studio handles update by passing full list back minus deleted items
           />
         )}
       </main>

@@ -44,7 +44,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
 
   const handleAnalyze = async (type: 'PERSON' | 'PRODUCT') => {
     if (editImages.length === 0) {
-      alert("Please upload images first.");
+      alert("Veuillez d'abord télécharger des images.");
       return;
     }
     setIsAnalyzing(true);
@@ -52,7 +52,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
       const desc = await analyzeImageForTraining(editImages, type);
       setEditDescription(desc);
     } catch (error) {
-      alert("Analysis failed. Please try again.");
+      alert("L'analyse a échoué. Veuillez réessayer.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -60,7 +60,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
 
   const handleSave = async (type: 'PERSON' | 'PRODUCT') => {
     if (!editName || editImages.length === 0) {
-      alert("Please provide a name and upload at least one image.");
+      alert("Veuillez fournir un nom et télécharger au moins une image.");
       return;
     }
     
@@ -73,7 +73,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
         finalDescription = await analyzeImageForTraining(editImages, type);
         setEditDescription(finalDescription); 
       } catch (error) {
-        alert("Failed to auto-generate the identity description. You can try saving again or write a description manually.");
+        alert("Échec de l'auto-génération de la description d'identité. Vous pouvez essayer d'enregistrer à nouveau ou écrire une description manuellement.");
         setIsSaving(false);
         return;
       }
@@ -101,7 +101,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
   };
 
   const deleteProduct = (id: string) => {
-    if (confirm('Delete this product?')) {
+    if (confirm('Supprimer ce produit ?')) {
       onUpdateProducts(products.filter(p => p.id !== id));
     }
   };
@@ -115,7 +115,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
       <div className="max-w-3xl mx-auto p-6 bg-gray-900 rounded-xl border border-gray-800 animate-fade-in">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white">
-            {isNew ? 'Add New Product' : `Edit ${isUser ? 'Profile' : 'Product'}`}
+            {isNew ? 'Ajouter un Produit' : `Modifier ${isUser ? 'Profil' : 'Produit'}`}
           </h2>
           <button onClick={cancelEdit} className="text-gray-400 hover:text-white"><XIcon /></button>
         </div>
@@ -123,18 +123,18 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Name</label>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Nom</label>
               <input
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder={isUser ? "Your Name" : "Product Name"}
+                placeholder={isUser ? "Votre Nom" : "Nom du Produit"}
               />
             </div>
 
             <ImageUploader
-              label="Reference Photos"
-              description={`Upload up to 20 clear photos of ${isUser ? 'your face' : 'the product'}.`}
+              label="Photos de Référence"
+              description={`Téléchargez jusqu'à 20 photos claires de ${isUser ? 'votre visage' : 'du produit'}.`}
               images={editImages}
               onImagesChange={setEditImages}
               maxImages={20}
@@ -144,7 +144,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
           <div className="space-y-4 flex flex-col">
              <div className="flex justify-between items-center">
                <label className="block text-sm font-medium text-gray-400">
-                 AI Description (The "Truth")
+                 Description IA (La "Vérité")
                </label>
                <button 
                   onClick={() => handleAnalyze(type)}
@@ -152,7 +152,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
                   className="text-xs flex items-center gap-1 text-blue-400 hover:text-blue-300 disabled:opacity-50"
                >
                  <Sparkles size={12} />
-                 {isAnalyzing ? 'Analyzing...' : 'Regenerate'}
+                 {isAnalyzing ? 'Analyse...' : 'Régénérer'}
                </button>
              </div>
              
@@ -161,20 +161,20 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
                  value={editDescription}
                  onChange={(e) => setEditDescription(e.target.value)}
                  className="w-full h-full min-h-[300px] bg-gray-950 border border-gray-800 rounded-lg p-4 text-sm text-gray-300 focus:ring-2 focus:ring-blue-500/50 outline-none resize-none leading-relaxed"
-                 placeholder={isAnalyzing || isSaving ? "Analyzing features..." : "Upload photos. This description will be auto-generated on save if you leave it empty."}
+                 placeholder={isAnalyzing || isSaving ? "Analyse des caractéristiques..." : "Téléchargez des photos. Cette description sera générée automatiquement à l'enregistrement si vous la laissez vide."}
                />
                <div className="absolute bottom-4 right-4 text-[10px] text-gray-500 bg-black/50 px-2 py-1 rounded">
-                 Tip: Edit this text to correct any errors.
+                 Astuce : Modifiez ce texte pour corriger les erreurs.
                </div>
              </div>
           </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-6 border-t border-gray-800 mt-6">
-          <Button variant="secondary" onClick={cancelEdit} disabled={isSaving}>Cancel</Button>
+          <Button variant="secondary" onClick={cancelEdit} disabled={isSaving}>Annuler</Button>
           <Button onClick={() => handleSave(type)} disabled={isSaving || !editName} isLoading={isSaving}>
             <Save size={18} />
-            {isSaving ? 'Creating Identity...' : 'Save Changes'}
+            {isSaving ? 'Création Identité...' : 'Enregistrer'}
           </Button>
         </div>
       </div>
@@ -184,8 +184,8 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Studio Management</h1>
-        <p className="text-gray-400">Manage your digital twins and product catalog.</p>
+        <h1 className="text-3xl font-bold text-white">Gestion du Studio</h1>
+        <p className="text-gray-400">Gérez vos jumeaux numériques et votre catalogue de produits.</p>
       </header>
 
       {/* User Profile Section */}
@@ -193,17 +193,17 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              User Profile
-              {user && <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded">Active</span>}
+              Profil Utilisateur
+              {user && <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded">Actif</span>}
             </h2>
-            <p className="text-sm text-gray-400">Your digital likeness data.</p>
+            <p className="text-sm text-gray-400">Vos données d'apparence numérique.</p>
           </div>
           {user ? (
             <Button variant="secondary" onClick={() => startEdit(user)} className="py-1 px-3 text-sm">
-              <Edit2 size={14} /> Edit
+              <Edit2 size={14} /> Modifier
             </Button>
           ) : (
-            <p className="text-red-400 text-sm">Profile Missing</p>
+            <p className="text-red-400 text-sm">Profil Manquant</p>
           )}
         </div>
         
@@ -220,7 +220,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
               )}
             </div>
             <div className="bg-black/30 p-4 rounded-lg border border-gray-800 w-full">
-              <p className="text-xs font-mono text-blue-400 mb-2 uppercase tracking-wider">Description Logic</p>
+              <p className="text-xs font-mono text-blue-400 mb-2 uppercase tracking-wider">Logique de Description</p>
               <p className="text-sm text-gray-400 line-clamp-3">{user.description}</p>
             </div>
           </div>
@@ -231,11 +231,11 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
       <section className="space-y-4">
         <div className="flex justify-between items-end">
           <div>
-            <h2 className="text-xl font-bold text-white">Products</h2>
-            <p className="text-sm text-gray-400">Your catalog of trained items.</p>
+            <h2 className="text-xl font-bold text-white">Produits</h2>
+            <p className="text-sm text-gray-400">Votre catalogue d'objets entraînés.</p>
           </div>
           <Button onClick={startNewProduct} className="py-2 px-4">
-            <Plus size={18} /> Add Product
+            <Plus size={18} /> Ajouter Produit
           </Button>
         </div>
 
@@ -271,7 +271,7 @@ export const Studio: React.FC<StudioProps> = ({ user, products, onUpdateUser, on
           
           {products.length === 0 && (
             <div className="col-span-full py-12 text-center border-2 border-dashed border-gray-800 rounded-xl text-gray-500">
-              No products trained yet. Click "Add Product" to start.
+              Aucun produit entraîné pour le moment. Cliquez sur "Ajouter Produit" pour commencer.
             </div>
           )}
         </div>

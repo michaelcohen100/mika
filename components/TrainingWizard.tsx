@@ -43,7 +43,7 @@ export const TrainingWizard: React.FC<TrainingWizardProps> = ({ onComplete }) =>
           productName: data.productName!
         });
       } catch (error) {
-        alert("Failed to analyze images. Please try again.");
+        alert("Échec de l'analyse des images. Veuillez réessayer.");
       } finally {
         setIsAnalyzing(false);
       }
@@ -59,13 +59,13 @@ export const TrainingWizard: React.FC<TrainingWizardProps> = ({ onComplete }) =>
           <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step >= 1 ? 'bg-gray-900 border-blue-500' : 'bg-gray-900 border-gray-700'}`}>
             <Camera size={20} />
           </div>
-          <span className="text-xs font-medium">You</span>
+          <span className="text-xs font-medium">Vous</span>
         </div>
         <div className={`flex flex-col items-center gap-2 ${step >= 2 ? 'text-blue-400' : 'text-gray-600'}`}>
           <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step >= 2 ? 'bg-gray-900 border-blue-500' : 'bg-gray-900 border-gray-700'}`}>
             <Package size={20} />
           </div>
-          <span className="text-xs font-medium">Product</span>
+          <span className="text-xs font-medium">Produit</span>
         </div>
       </div>
 
@@ -73,24 +73,24 @@ export const TrainingWizard: React.FC<TrainingWizardProps> = ({ onComplete }) =>
         {step === 1 ? (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2">Introduce yourself</h2>
-              <p className="text-gray-400">Gemini needs to learn what you look like. Upload clear photos of your face.</p>
+              <h2 className="text-2xl font-bold mb-2">Présentez-vous</h2>
+              <p className="text-gray-400">Gemini a besoin d'apprendre à quoi vous ressemblez. Téléchargez des photos claires de votre visage.</p>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Your Name</label>
+              <label className="text-sm font-medium text-gray-300">Votre Prénom</label>
               <input
                 type="text"
                 value={data.userName}
                 onChange={e => setData({...data, userName: e.target.value})}
-                placeholder="e.g. Alex"
+                placeholder="ex: Alex"
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             <ImageUploader
-              label="Your Photos"
-              description="Upload 1 to 20 clear photos. More photos = better accuracy, but one is enough to start."
+              label="Vos Photos"
+              description="Téléchargez 1 à 20 photos claires. Plus il y en a, meilleure est la précision, mais une seule suffit pour commencer."
               images={data.userImages || []}
               onImagesChange={imgs => setData({...data, userImages: imgs})}
               maxImages={20}
@@ -99,24 +99,24 @@ export const TrainingWizard: React.FC<TrainingWizardProps> = ({ onComplete }) =>
         ) : (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2">Showcase your product</h2>
-              <p className="text-gray-400">Upload photos of the product you want to feature in your visuals.</p>
+              <h2 className="text-2xl font-bold mb-2">Présentez votre produit</h2>
+              <p className="text-gray-400">Téléchargez des photos du produit que vous souhaitez mettre en avant.</p>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Product Name</label>
+              <label className="text-sm font-medium text-gray-300">Nom du Produit</label>
               <input
                 type="text"
                 value={data.productName}
                 onChange={e => setData({...data, productName: e.target.value})}
-                placeholder="e.g. Chronos Watch"
+                placeholder="ex: Montre Chronos"
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             <ImageUploader
-              label="Product Photos"
-              description="Upload 1 to 20 photos from different angles."
+              label="Photos du Produit"
+              description="Téléchargez 1 à 20 photos sous différents angles."
               images={data.productImages || []}
               onImagesChange={imgs => setData({...data, productImages: imgs})}
               maxImages={20}
@@ -130,7 +130,7 @@ export const TrainingWizard: React.FC<TrainingWizardProps> = ({ onComplete }) =>
             isLoading={isAnalyzing}
             disabled={(step === 1 && (!data.userName || !data.userImages?.length)) || (step === 2 && (!data.productName || !data.productImages?.length))}
           >
-            {step === 1 ? 'Next Step' : 'Start Training'}
+            {step === 1 ? 'Suivant' : 'Commencer l\'entraînement'}
             {!isAnalyzing && <ArrowRight size={18} />}
           </Button>
         </div>
@@ -138,7 +138,7 @@ export const TrainingWizard: React.FC<TrainingWizardProps> = ({ onComplete }) =>
       
       {isAnalyzing && (
         <div className="text-center mt-4 text-gray-400 text-sm animate-pulse">
-          Gemini is analyzing features and building visual models...
+          Gemini analyse les caractéristiques et construit les modèles visuels...
         </div>
       )}
     </div>

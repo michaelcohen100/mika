@@ -107,7 +107,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           <label className="aspect-square rounded-lg border-2 border-dashed border-gray-700 hover:border-blue-500 bg-gray-800/50 hover:bg-gray-800 flex flex-col items-center justify-center cursor-pointer transition-all group">
             <Upload className="w-6 h-6 text-gray-500 group-hover:text-blue-500 mb-2" />
             <span className="text-[10px] text-gray-400 group-hover:text-blue-400 text-center px-1">
-              Add Photo
+              Ajouter
             </span>
             <input
               type="file"
